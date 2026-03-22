@@ -319,7 +319,8 @@ def _openimage(image, targetpath, filename):
                 % (image, i, error),
                 2,
             )
+            if xbmc.abortRequested():
+                return ""
             xbmc.sleep(500)
-            pass
 
     return ""

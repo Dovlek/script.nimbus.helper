@@ -318,7 +318,9 @@ class CPaths:
     def write_xml(self, xml_file, final_format):
         with xbmcvfs.File(xml_file, "w") as f:
             f.write(final_format)
-        Thread(target=self.reload_skin).start()
+        t = Thread(target=self.reload_skin)
+        t.daemon = True
+        t.start()
 
     def handle_path_browser_results(self, cpath_setting, context):
         result = self.path_browser()
@@ -655,7 +657,9 @@ class CPaths:
         with xbmcvfs.File(xml_file, "w") as f:
             f.write(final_format)
         self.update_skin_strings()
-        Thread(target=self.reload_skin).start()
+        t = Thread(target=self.reload_skin)
+        t.daemon = True
+        t.start()
 
 
 def files_get_directory(directory, properties=["title", "file", "thumbnail"]):

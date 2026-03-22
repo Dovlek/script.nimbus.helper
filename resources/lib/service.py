@@ -29,13 +29,20 @@ class Service(xbmc.Monitor):
     def run(self):
         """Start the service and monitor."""
         self.image_monitor.start()
+        ratings_thread = None
         while not self.abortRequested():
             if self._should_pause():
                 self.waitForAbort(2)
                 continue
 
-            self.ratings_monitor.process_current_item()
+            if ratings_thread is None or not ratings_thread.is_alive():
+                ratings_thread = Thread(
+                    target=self.ratings_monitor.process_current_item,
+                    daemon=True,
+                )
+                ratings_thread.start()
             self.waitForAbort(0.2)
+        self.image_monitor.stop()
 
     def _should_pause(self):
         """Determine if service should pause."""

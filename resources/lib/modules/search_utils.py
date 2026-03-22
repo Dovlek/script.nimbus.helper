@@ -198,7 +198,9 @@ class SPaths:
         def load_widgets_and_clear_flag():
             xbmc.sleep(800)
             self.home_window.clearProperty("nimbus.search.refreshing")
-        Thread(target=load_widgets_and_clear_flag).start()
+        t = Thread(target=load_widgets_and_clear_flag)
+        t.daemon = True
+        t.start()
 
 
     def re_search(self):

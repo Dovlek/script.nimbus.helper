@@ -177,11 +177,13 @@ class MDbListClient(BaseAPIClient):
 
                 elif source == "letterboxd":
                     if value is not None and value != 0:
-                        letterboxd_value = float(value) * 2
-                        data["letterboxdRating"] = str(letterboxd_value)
+                        raw = float(value)
+                        data["letterboxdRating"] = str(raw)
+                        data["letterboxdRatingX2"] = str(raw * 2)
                         data["letterboxdImage"] = RATINGS_IMAGE_PATH + "letterboxd.png"
                     else:
                         data["letterboxdRating"] = ""
+                        data["letterboxdRatingX2"] = ""
                         data["letterboxdImage"] = ""
 
                 elif source == "tomatoes":

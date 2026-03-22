@@ -16,6 +16,7 @@ class RatingsDatabase:
     def _initialize_database(self) -> None:
         """Create database tables if they don't exist."""
         with sqlite3.connect(self.db_path, timeout=60) as conn:
+            conn.execute("PRAGMA journal_mode=WAL")
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS ratings (

@@ -53,7 +53,7 @@ class TMDbClient(BaseAPIClient):
             params["year"] = year
             
         try:
-            response = self.session.get(f"{self.base_url}/search/{media_type}", params=params)
+            response = self.session.get(f"{self.base_url}/search/{media_type}", params=params, timeout=10)
             if response.status_code == 200:
                 return response.json().get("results", [])
         except requests.RequestException as e:
@@ -93,8 +93,9 @@ class TMDbClient(BaseAPIClient):
         params = {"api_key": self.api_key}
         try:
             response = self.session.get(
-                f"{self.base_url}/{media_type}/{tmdb_id}/external_ids", 
-                params=params
+                f"{self.base_url}/{media_type}/{tmdb_id}/external_ids",
+                params=params,
+                timeout=10,
             )
             if response.status_code == 200:
                 return response.json().get("imdb_id")
