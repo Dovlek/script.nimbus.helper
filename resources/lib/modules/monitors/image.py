@@ -37,14 +37,15 @@ class ImageMonitor(threading.Thread):
 
     def run(self) -> None:
         """Main monitoring loop."""
-        while not self._stop_event.is_set():
+        monitor = xbmc.Monitor()
+        while not self._stop_event.is_set() and not monitor.abortRequested():
             try:
                 if self._is_paused():
-                    self._stop_event.wait(2)
+                    monitor.waitForAbort(2)
                     continue
 
                 if self._not_nimbus():
-                    self._stop_event.wait(15)
+                    monitor.waitForAbort(15)
                     continue
 
                 current_config = ImageAnalysisConfig.from_skin_settings()
@@ -54,13 +55,13 @@ class ImageMonitor(threading.Thread):
                         radius=current_config.radius,
                         saturation=current_config.saturation,
                     )
-                    self._stop_event.wait(0.2)
+                    monitor.waitForAbort(0.2)
                 else:
-                    self._stop_event.wait(3)
+                    monitor.waitForAbort(3)
 
             except Exception as e:
                 xbmc.log(f"Image analysis error: {str(e)}", xbmc.LOGERROR)
-                self._stop_event.wait(0.2)
+                monitor.waitForAbort(0.2)
 
     def _is_paused(self) -> bool:
         return xbmc.getInfoLabel("Window(Home).Property(pause_services)") == "true"
