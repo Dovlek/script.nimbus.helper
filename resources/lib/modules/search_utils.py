@@ -182,12 +182,14 @@ class SPaths:
                 return
         self.home_window.setProperty("nimbus.search.refreshing", "true")
         encoded_search_term = quote(search_term)
+        history_enabled = not xbmc.getCondVisibility("Skin.HasSetting(DisableSearchHistory)")
         existing_spath_id = self.check_spath_exists(search_term)
-        if existing_spath_id:
-            self.remove_spath_from_database(existing_spath_id)
-        self.add_spath_to_database(search_term)
-        existing_spath_id = self.check_spath_exists(search_term)
-        self.update_search_history_properties(search_term, existing_spath_id)
+        if history_enabled:
+            if existing_spath_id:
+                self.remove_spath_from_database(existing_spath_id)
+            self.add_spath_to_database(search_term)
+            existing_spath_id = self.check_spath_exists(search_term)
+            self.update_search_history_properties(search_term, existing_spath_id)
         self.home_window.setProperty("nimbus.search.input", search_term)
         self.home_window.setProperty("nimbus.search.input.encoded", encoded_search_term)
         self.home_window.setProperty("nimbus.search.input.trakt.encoded", encoded_search_term)
