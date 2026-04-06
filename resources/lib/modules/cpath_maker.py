@@ -468,11 +468,22 @@ class CPaths:
             ("Remake", "remake_path"),
             ("Remove", "clear_path"),
         ]
+        spinner_setting = None
         if context == "widget":
+            parts = cpath_setting.split(".")
+            if len(parts) >= 3 and parts[-1].isdigit():
+                _base_ids = {"movie": 19010, "tvshow": 22010, "custom1": 23010, "custom2": 24010, "custom3": 25010}
+                w_list_id = _base_ids.get(parts[0], 0) + int(parts[-1])
+                spinner_setting = "no_spinner_%d" % w_list_id
+                spinner_state = "On" if not xbmc.getCondVisibility("Skin.HasSetting(%s)" % spinner_setting) else "Off"
+                spinner_label = "Loading indicator: %s" % spinner_state
+            else:
+                spinner_label = "Loading indicator"
             choices = [
                 ("Move up", "move_up"),
                 ("Move down", "move_down"),
                 ("Display type", "display_type"),
+                (spinner_label, "toggle_spinner"),
             ] + choices
         if xbmc.getCondVisibility("Window.IsActive(home)"):
             selected_label = xbmc.getInfoLabel("Container(9000).ListItem.Label")
@@ -503,6 +514,11 @@ class CPaths:
                     current_order - 1 if action == "move_up" else current_order + 1
                 )
             self.swap_widgets(parts, current_order, new_order)
+        elif action == "toggle_spinner" and spinner_setting:
+            if xbmc.getCondVisibility("Skin.HasSetting(%s)" % spinner_setting):
+                xbmc.executebuiltin("Skin.Reset(%s)" % spinner_setting)
+            else:
+                xbmc.executebuiltin("Skin.SetBool(%s)" % spinner_setting)
         elif action == "remake_path":
             self.remove_cpath_from_database(cpath_setting)
             result = self.path_browser()
