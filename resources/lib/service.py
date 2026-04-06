@@ -8,6 +8,25 @@ from modules.databases.ratings import RatingsDatabase
 from modules.config import SETTINGS_PATH
 
 
+class TrailerPlayerMonitor(xbmc.Player):
+    def onAVStarted(self):
+        if not xbmc.getCondVisibility("Skin.HasSetting(Trailer.AutoSubtitles)"):
+            return
+        playing_path = xbmc.getInfoLabel("Player.FilenameAndPath")
+        nimbus_trailer = xbmc.getInfoLabel("Skin.String(TrailerPlaying)")
+        if "slyguy.trailers" not in playing_path and not nimbus_trailer:
+            return
+        def _enable():
+            for _ in range(10):
+                streams = self.getAvailableSubtitleStreams()
+                if streams:
+                    self.setSubtitleStream(0)
+                    self.showSubtitles(True)
+                    return
+                xbmc.sleep(300)
+        Thread(target=_enable, daemon=True).start()
+
+
 class Service(xbmc.Monitor):
     """Main service class that coordinates monitor and rating lookups."""
 
@@ -25,6 +44,7 @@ class Service(xbmc.Monitor):
         self.get_visibility = xbmc.getCondVisibility
         self.image_monitor = ImageMonitor(ImageBlur, ImageAnalysisConfig())
         self.ratings_monitor = RatingsMonitor(RatingsDatabase(), self.home_window)
+        self.trailer_player = TrailerPlayerMonitor()
 
     def run(self):
         """Start the service and monitor."""

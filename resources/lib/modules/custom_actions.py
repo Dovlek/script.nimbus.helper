@@ -107,6 +107,20 @@ def play_trailer():
                 xbmc.executebuiltin(f"PlayMedia({play_url},0,noresume)")
             else:
                 xbmc.executebuiltin(f"PlayMedia({play_url},1,noresume)")
+            if xbmc.getCondVisibility("Skin.HasSetting(Trailer.AutoSubtitles)"):
+                import threading
+                def _enable_subtitles():
+                    player = xbmc.Player()
+                    for _ in range(20):
+                        xbmc.sleep(500)
+                        if player.isPlaying():
+                            for _ in range(10):
+                                if player.getAvailableSubtitleStreams():
+                                    player.showSubtitles(True)
+                                    return
+                                xbmc.sleep(300)
+                            return
+                threading.Thread(target=_enable_subtitles, daemon=True).start()
 
 
 def check_api_key(api_key):
